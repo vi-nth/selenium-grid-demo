@@ -69,8 +69,9 @@ public class Level_01_Register_Login {
 	
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
+
 		driver.get("https://demo.nopcommerce.com/");
-		
+
 		firstName = "Automation";
 		lastName = "FC";
 		email = "automation" + getRandomNumber() + "@us.com";
