@@ -1,5 +1,6 @@
 package selenium;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
@@ -9,6 +10,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -18,8 +20,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
-
-import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class Level_01_Register_Login {
 	String projectPath = System.getProperty("user.dir");
@@ -31,22 +31,21 @@ public class Level_01_Register_Login {
 	@BeforeClass
 	public void beforeClass(String browserName, String ipAddress, String portNumber) {
 		DesiredCapabilities capability = null;
-
 		switch (browserName) {
 		case "firefox":
-			System.setProperty("webdriver.gecko.driver", projectPath+"\\browserDrivers\\geckodriver.exe");
-			//WebDriverManager.firefoxdriver().setup();
+			System.setProperty("webdriver.gecko.driver", projectPath + "\\browserDrivers\\geckodriver.exe");
+			File pathBinary = new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+			FirefoxBinary firefoxBinary = new FirefoxBinary(pathBinary);   
+			FirefoxOptions options = new FirefoxOptions();
+			
 			capability = DesiredCapabilities.firefox();
 			capability.setBrowserName("firefox");
 			capability.setPlatform(Platform.WINDOWS);
-
-			FirefoxOptions fOptions = new FirefoxOptions();
-			fOptions.merge(capability);
+			capability.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options.setBinary(firefoxBinary));
+			options.merge(capability);
 			break;
-
 		case "chrome":
 			System.setProperty("webdriver.chrome.driver", projectPath + "\\browserDrivers\\chromedriver.exe");
-			//WebDriverManager.chromedriver().setup();
 			capability = DesiredCapabilities.chrome();
 			capability.setBrowserName("chrome");
 			capability.setPlatform(Platform.WINDOWS);
@@ -54,18 +53,17 @@ public class Level_01_Register_Login {
 			ChromeOptions cOptions = new ChromeOptions();
 			cOptions.merge(capability);
 			break;
-
 		default:
 			throw new RuntimeException("Browser is not valid!");
 		}
 
 		try {
-			driver = new RemoteWebDriver(new URL(String.format("http://%s:%s/wd/hub", ipAddress, portNumber)), capability);
+			driver = new RemoteWebDriver(new URL(String.format("http://%s:%s/wd/hub", ipAddress, portNumber)),
+					capability);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		
-	
+
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
 
